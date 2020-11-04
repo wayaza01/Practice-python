@@ -48,7 +48,6 @@ else:
             yr = (X * (xp - xr) - yp) % p
 
 print("xr, yr: ", xr, ",", yr, )
-print(X)
 
 t = time.time() - start
 T = round(t, 3)
