@@ -1,0 +1,69 @@
+import math, time
+start = time.time()
+
+def main():
+    print('enter->P1(xp, yp)')
+    # xp, yp = 5, 2
+    map(int, input().split())
+    zp = 1
+
+    print('enter->P2(xq, yq)')
+    xq, yq = map(int, input().split())
+    zq = 1
+
+    a, b, p= 3, 7, 7
+    
+    (xr, yr, zr)= projection(xp, yp, xq, yq, zp, zq, a, b, p)
+    print(xr, yr)
+
+'============================================================================'
+def gcd(a, b):
+    while a != 0:
+        a, b = b % a, a
+    return b
+
+
+def findModInverse(a, m):
+    if gcd(a, m) != 1:
+        return None
+
+    u1, u2, u3 = 1, 0, a
+    v1, v2, v3 = 0, 1, m
+    while v3 != 0:
+        q = u3 // v3 # // is the integer division operator
+        v1, v2, v3, u1, u2, u3 = (u1 - q * v1), (u2 - q * v2), (u3 - q * v3), v1, v2, v3
+    return u1 % m
+'============================================================================'
+
+def projection(xp, yp, xq, yq, zp, zq, a, b, p):
+    if(xp==xq and yp==yq):
+        w= (a*zp*zp + 3*xp*xp)
+        s= (yp*zp)
+        B= (s*xp*yp)
+        h= (w*w - 8*B)
+        
+        #zr= (8*s*s*s)*cryptomath.findModInverse(8*s**3, p)
+        #zr= 8*s**3%p
+        zr= findModInverse(8*s**3, p)
+        xr= ((2*h*s))%p
+        yr= ((w*(4*B - h) - 8*yp*2*s*s))%p
+    else:
+        u= (yq*zp - yp*zq)
+        v= (xq*zp - xp*zq)
+        A= (u*u*zp*zq - v*v*v - 2*v*2*xp*zq)
+        
+        #zr= (v**3)*cryptomath.findModInverse(v**3, p)
+        #zr= v**3%p
+        zr= findModInverse(v**3, p)
+        xr= ((v*A))%p
+        yr= ((u*(v*v*xp*zq - A) - v*v*v*yp*zq))%p
+        
+    return(xr, yr, zr)
+        
+# 関数の呼び出し
+if __name__ == '__main__':
+    main()
+
+t = time.time() - start 
+T = round(t, 3)
+print("Time :", T)
