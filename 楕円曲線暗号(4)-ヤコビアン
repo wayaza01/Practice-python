@@ -1,0 +1,91 @@
+## (1)のプログラム
+import math, time
+
+start = time.time()
+
+def main():
+    # print('enter->P1(xp, yp)')
+    # xp, yp= map(int, input().split())
+    xp, yp = 5, 2
+    zp = 1
+
+    print('enter->P2(xq, yq)')
+    xq, yq = map(int, input().split())
+    zq = 1
+
+    a, b, p= 3, 7, 7
+    
+    (xr, yr, zr)= projection(xp, yp, xq, yq, zp, zq, a, b, p)
+    print(xr, yr)
+    if zr==0:
+        print('無限遠点')
+    
+def projection(xp, yp, xq, yq, zp, zq, a, b, p):
+    s= (4*xp*yp*yp)%p
+    m= (3*xp*xp + a*zp*zp*zp*zp)%p
+    T= (-2*s + m*m)%p
+
+    U1= (xp*zq*zq)%p
+    U2= (xq*zp*zp)%p
+    S1= (yp*zq*zq*zq)%p
+    S2= (yq*zp*zp*zp)%p
+    H= (U2-U1)%p
+    r= (S2-S1)%p
+
+    if(xp==xq and yp!=yq):
+        xr= 0
+        yr= 0
+        zr= 0
+    if(xp==xq and yp==0 and yq==0):
+        xr= 0
+        yr= 0
+        zr= 0
+    elif(xp==xq and yp+yq==p):
+        xr= 0
+        yr= 0
+        zr= 0
+    elif(xq==0 and yq==0):
+        xr= xp
+        yr= yp
+        zr= zp
+    else:
+        if(zp==0 and zq!=0):
+            xr= xq
+            yr= yq
+            zr= zq
+        elif(zq==0 and zp!=0):
+            xr= xp
+            yr= xp
+            zr= zp
+        elif(zp==0 and zq==0):
+            xr= 0
+            yr= 0
+            zr= 0
+        elif(xp==xq and yp==yq):
+            xr= (T)
+            yr= (-8*yp**4 + m*(s-T))
+            zr= (2*yp*zp)
+        else:
+            xr= (-H**3 - 2*U1*H*H + r*r)
+            yr= (-S1*H**3 + r*(U1*H*H - xr))
+            zr= (zp*zq*H)
+            
+    if(xr==0 or zr==0):
+        yr== yr
+    elif(zr!=1):
+        xr= (xr*pow(zr, -2, p))%p
+        yr= (yr*pow(zr, -3, p))%p
+        zr= 1
+    
+    xr= xr%p
+    yr= yr%p
+    zr= zr%p
+    return(xr, yr, zr)
+        
+# 関数の呼び出し
+if __name__ == '__main__':
+    main()
+
+t = time.time() - start 
+T = round(t, 3)
+print("Time :", T)
