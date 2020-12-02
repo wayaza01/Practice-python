@@ -77,6 +77,7 @@ def window(xp,yp,k,p,a,b,D,l):
     xp1, yp1= xp, yp
     xp2, yp2= Plus.plus(xq,yq,xq,yq,a,b,p)
     xp3, yp3= Plus.plus(xp2,yp2,xq,yq,a,b,p)
+    xp4, yp4= Plus.plus(xp3,yp3,xq,yq,a,b,p)
     
     if len(D)==1 and D[0]==1:
         (xq,yq)=(xp,yp)
@@ -85,22 +86,17 @@ def window(xp,yp,k,p,a,b,D,l):
         if D[1]=='0':
             (xq,yq)=Plus.plus(xq,yq,xq,yq,a,b,p)
         elif D[1]=='1':
-            for c in range(0, 3):
-                (xq,yq)=Plus.plus(xq,yq,xq,yq,a,b,p)
+            (xq,yq)=Plus.plus(xq,yq,xp2,yp2,a,b,p)
                 
     if len(D)==3:
         if D[1]=='0' and D[2]=='0':
-            for c in range(0, 3):
-                (xq,yq)=Plus.plus(xq,yq,xp,yp,a,b,p)
+            (xq,yq)=Plus.plus(xq,yq,xp3,yp3,a,b,p)
         if D[1]=='0' and D[2]=='1':
-            for c in range(0, 4):
-                (xq,yq)=Plus.plus(xq,yq,xp,yp,a,b,p)
+            (xq,yq)=Plus.plus(xp2,yp2,xp3,yp3,a,b,p)
         if D[1]=='1' and D[2]=='0':
-            for c in range(0, 5):
-                (xq,yq)=Plus.plus(xq,yq,xp,yp,a,b,p)
+            (xq,yq)=Plus.plus(xp3,yp3,xp3,yp3,a,b,p)
         if D[1]=='1' and D[2]=='1':
-            for c in range(0, 6):
-                (xq,yq)=Plus.plus(xq,yq,xp,yp,a,b,p)
+            (xq,yq)=Plus.plus(xp4,yp4,xp3,yp3,a,b,p)
         
     if len(D)>4 or len(D)==4:
         if D[0]=='1' and D[1]=='0':
@@ -114,11 +110,9 @@ def window(xp,yp,k,p,a,b,D,l):
                     (xq,yq)=Plus.plus(xq,yq,xq,yq,a,b,p)
 
                 if D[i]=="1" and D[i+1]=="1":
-                    for c in range(0, 3):
-                        (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                    (xq,yq)=Plus.plus(xq,yq,xp3,yp3,a,b,p)
                 elif D[i]=="1" and D[i+1]=="0":
-                    for c in range(0, 2):
-                        (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                    (xq,yq)=Plus.plus(xq,yq,xp2,yp2,a,b,p)
                 elif D[i]=="0" and D[i+1]=="1":
                         (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
                 elif D[i]=="0" and D[i+1]=="0":
@@ -129,21 +123,17 @@ def window(xp,yp,k,p,a,b,D,l):
             if D[len(D)-1]=='1':
                 (xq,yq)= Plus.plus(xq,yq,xp1,yp1,a,b,p)
                 
-            
         elif(len(D)%2==0):
             for i in range(2, len(D)-1, 2):
                 for c in range(0, 2):
                     (xq,yq)=Plus.plus(xq,yq,xq,yq,a,b,p)
-                    
                 if D[i]=="1" and D[i+1]=="1":
-                    for c in range(0, 3):
-                        (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                        (xq,yq)=Plus.plus(xq,yq,xp3,yp3,a,b,p)
                 elif D[i]=="1" and D[i+1]=="0":
-                    for c in range(0, 2):
-                        (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                        (xq,yq)=Plus.plus(xq,yq,xp2,yp2,a,b,p)
                 elif D[i]=="0" and D[i+1]=="1":
                     (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
-            
+                     
     return(xq,yq)
 
 if __name__ == '__main__':
