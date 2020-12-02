@@ -1,0 +1,153 @@
+def main():
+    xp, yp = 0, 2
+    
+    print("enter->k")
+    k=int(input())
+    a, b, p= 3, 7, 7
+    print('a :', a, ',' 'b :', b, ',' 'p :', p)
+    print("xp, yp:", xp, ',', yp )
+    
+    D= format(k, 'b')
+    l= list(D)
+    
+    (xq,yq)= window(xp,yp,k,p,a,b,D,l)
+    print(xq,yq)
+
+# http://inventwithpython.com/hacking (BSD Licensed)
+def gcd(a, b):
+    while a != 0:
+        a, b = b % a, a
+    return b
+
+def findModInverse(a, m):
+    if gcd(a, m) != 1:
+        return None
+    u1, u2, u3 = 1, 0, a
+    v1, v2, v3 = 0, 1, m
+    while v3 != 0:
+        q = u3 // v3
+        v1, v2, v3, u1, u2, u3 = (u1 - q * v1), (u2 - q * v2), (u3 - q * v3), v1, v2, v3
+    return u1 % m
+
+def plus(xp,yp,xq,yq,a,b,p):
+    if xp==xq and yp!=yq:
+        xr=-1
+        yr=-1
+    if xp==xq and yp==0 and yq==0:
+        xr=-1
+        yr=-1
+    if xp==xq and yp+yq==p:
+        xr=-1
+        yr=-1
+    else: 
+        if xp==-1&yp==-1:
+                xr=xq
+                yr=yq
+        elif xq==-1&yq==-1:
+                xr=xp
+                yr=yp
+        elif yp==-yq:
+                xr=-1
+                yr=-1
+        elif xp==xq:
+            ramda=(((3*xp**2)+a)*findModInverse(2*yp,p))%p
+            xr=(ramda**2-xp-xq)%p
+            yr=(ramda*(xp-xr)-yp)%p
+        else:
+            if xp!=yp:
+                xp,xq=xq,xp
+                yp,yq=yq,yp
+                ramda=((yp-yq)*findModInverse((xp-xq)%p,p))%p
+                xr=(ramda**2-xp-xq)%p
+                yr=(ramda*(xp-xr)-yp)%p
+                xp,xq=xq,xp
+                yp,yq=yq,yp
+            
+            else:
+                ramda=((yp-yq)*findModInverse((xp-xq)%p,p))%p
+                xr=(ramda**2-xp-xq)%p
+                yr=(ramda*(xp-xr)-yp)%p
+              
+    return (xr,yr)
+
+def window(xp,yp,k,p,a,b,D,l):
+    (xq,yq)=(xp,yp)
+    
+    xp0, yp0= 0, 0
+    xp1, yp1= xp, yp
+    xp2, yp2= Plus.plus(xq,yq,xq,yq,a,b,p)
+    xp3, yp3= Plus.plus(xp2,yp2,xq,yq,a,b,p)
+    
+    if len(D)==1 and D[0]==1:
+        (xq,yq)=(xp,yp)
+    
+    if len(D)==2:
+        if D[1]=='0':
+            (xq,yq)=Plus.plus(xq,yq,xq,yq,a,b,p)
+        elif D[1]=='1':
+            for c in range(0, 3):
+                (xq,yq)=Plus.plus(xq,yq,xq,yq,a,b,p)
+                
+    if len(D)==3:
+        if D[1]=='0' and D[2]=='0':
+            for c in range(0, 3):
+                (xq,yq)=Plus.plus(xq,yq,xp,yp,a,b,p)
+        if D[1]=='0' and D[2]=='1':
+            for c in range(0, 4):
+                (xq,yq)=Plus.plus(xq,yq,xp,yp,a,b,p)
+        if D[1]=='1' and D[2]=='0':
+            for c in range(0, 5):
+                (xq,yq)=Plus.plus(xq,yq,xp,yp,a,b,p)
+        if D[1]=='1' and D[2]=='1':
+            for c in range(0, 6):
+                (xq,yq)=Plus.plus(xq,yq,xp,yp,a,b,p)
+        
+    if len(D)>4 or len(D)==4:
+        if D[0]=='1' and D[1]=='0':
+            xq, yq= xp2, yp2
+        if D[0]=='1' and D[1]=='1':
+            xq, yq= xp3, yp3
+        
+        if(len(D)%2!=0):
+            for i in range(2, len(D)-1, 2):
+                for c in range(0, 2):
+                    (xq,yq)=Plus.plus(xq,yq,xq,yq,a,b,p)
+
+                if D[i]=="1" and D[i+1]=="1":
+                    for c in range(0, 3):
+                        (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                elif D[i]=="1" and D[i+1]=="0":
+                    for c in range(0, 2):
+                        (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                elif D[i]=="0" and D[i+1]=="1":
+                        (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                elif D[i]=="0" and D[i+1]=="0":
+                        (xq,yq)= (xq, yq)
+            
+            (xq,yq)= Plus.plus(xq,yq,xq,yq,a,b,p)
+               
+            if D[len(D)-1]=='1':
+                (xq,yq)= Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                
+            
+        elif(len(D)%2==0):
+            for i in range(2, len(D)-1, 2):
+                for c in range(0, 2):
+                    (xq,yq)=Plus.plus(xq,yq,xq,yq,a,b,p)
+                    
+                if D[i]=="1" and D[i+1]=="1":
+                    for c in range(0, 3):
+                        (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                elif D[i]=="1" and D[i+1]=="0":
+                    for c in range(0, 2):
+                        (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+                elif D[i]=="0" and D[i+1]=="1":
+                    (xq,yq)=Plus.plus(xq,yq,xp1,yp1,a,b,p)
+            
+    return(xq,yq)
+
+if __name__ == '__main__':
+    main()    
+    
+    
+    
