@@ -1,12 +1,9 @@
 import math, time
 
-# 開始時間を格納する
 start = time.time()
-# P(xp, yp)と Q(xq, yq)の入力
 xp, yp, xq, yq = list(map(int, input().split()))
 # y^2= x^3 + 3x + 4
-a = 3
-p = 7
+a, b, p= 3, 7, 7
 
 # http://inventwithpython.com/hacking (BSD Licensed)
 def gcd(a, b):
@@ -25,31 +22,46 @@ def findModInverse(a, m):
     return u1 % m
 
 # 加法公式
-if (xp == 0 and yp == 0):
-    xr = xq
-    yr = yq
-elif (xq == 0 and yq == 0):
-    xr = xp
-    yr = yp
-else:
-    if (yp == -yq):
-        xr = 0
-        yr = 0
-    else:
-        if (xp == xq):
-            # X= (3*xp^2 + a)/(2*yp)
-            X = ((3 * xp ** 2 + a) * findModInverse(2 * yp, p)) % p
-            xr = (X * X - xp - xq) % p
-            yr = (X * (xp - xr) - yp) % p
+def plus(xp,yp,xq,yq,a,b,p):
+    if xp==xq and yp!=yq:
+        xr=-1
+        yr=-1
+    if xp==xq and yp==0 and yq==0:
+        xr=-1
+        yr=-1
+    if xp==xq and yp+yq==p:
+        xr=-1
+        yr=-1
+    else: 
+        if xp==-1&yp==-1:
+                xr=xq
+                yr=yq
+        elif xq==-1&yq==-1:
+                xr=xp
+                yr=yp
+        elif yp==-yq:
+                xr=-1
+                yr=-1
+        elif xp==xq:
+            ramda=(((3*xp**2)+a)*findModInverse(2*yp,p))%p
+            xr=(ramda**2-xp-xq)%p
+            yr=(ramda*(xp-xr)-yp)%p
         else:
-            # X= (yp-yq)/(xp-xq)
-            X = ((yp - yq) * findModInverse((xp - xq) % p, p)) % p
-            xr = (X * X - xp - xq) % p
-            yr = (X * (xp - xr) - yp) % p
-
-print("xr, yr: ", xr, ",", yr, )
-
+            if xp!=yp:
+                xp,xq=xq,xp
+                yp,yq=yq,yp
+                ramda=((yp-yq)*findModInverse((xp-xq)%p,p))%p
+                xr=(ramda**2-xp-xq)%p
+                yr=(ramda*(xp-xr)-yp)%p
+                xp,xq=xq,xp
+                yp,yq=yq,yp
+            
+            else:
+                ramda=((yp-yq)*findModInverse((xp-xq)%p,p))%p
+                xr=(ramda**2-xp-xq)%p
+                yr=(ramda*(xp-xr)-yp)%p
+              
+    return (xr,yr)
 t = time.time() - start
 T = round(t, 3)
-# 現在時間から開始時間を引いた値(実行時間)を出力する
-print("累積処理時間 :", T)
+print("time :", T)
