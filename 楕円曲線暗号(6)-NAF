@@ -1,0 +1,111 @@
+### (1)のプログラム
+import math, time
+import cryptomath
+import Plus_Projection, Plus_Jacobian
+
+start = time.time()
+def main():
+    xp, yp = 0, 2
+    
+    print("enter->k")
+    k = int(input())
+    a, b, p = 3, 1, 7
+    zp, zq = 1, 1
+    
+    print('select mode 1, 2->')
+    select = int(input())
+    
+    D = format(k, 'b')    
+    l = list(D)
+    D_N = [] # リストDを数字リストに変えたもの
+    
+    for i in range(len(D)):
+        if D[i]=='0':
+            a_1 = 0
+            D_N.append(a_1)
+            
+        elif D[i]=='1':
+            a_1 = 1
+            D_N.append(a_1)   
+    
+    c = [0] # c_0 = 0をリスト内に用意にておく
+    naf = [] # NAFに変えたリスト
+
+    for i in range(len(D_N)+1):
+        if i== len(D_N)-1 or i>len(D_N)-1:
+            c_1 = (c[i])/2 
+            math.floor(c_1)
+            c_1 = int(c_1)
+            c_1 = c.append(c_1)
+            
+            s_1 = c[i] - (2*c[i+1])
+            naf.append(s_1)
+        
+        else:
+            c_1 = (D_N[i] + D_N[i+1] + c[i])/2
+            math.floor(c_1)
+            c_1 = int(c_1)
+            c_1 = c.append(c_1)
+        
+            s_1 = D_N[i] + c[i] - (2*c[i+1])
+            naf.append(s_1)
+        
+        #naf.reverse()
+        
+    #print('D_N is', D_N)
+    #print('c is', c)
+    print('naf is', naf)
+
+    if select == 1: ### 射影座標
+        (xq,yq,zq)= NAF_1(xp,yp,k,p,a,b,naf,zp,zq)
+        print(xq,yq)
+    if select == 2: ### ヤコビアン
+        (xq,yq,zq)= NAF_2(xp,yp,k,p,a,b,naf,zp,zq)
+        print(xq,yq)
+    
+def NAF_1(xp,yp,k,p,a,b,naf,zp,zq):### 射影座標
+    (xq,yq,zq)= (xp,yp,zp)
+    
+    xp0, yp0, zp0= 0, 0, 0
+    xp1, yp1, zp1= xp, yp, zp
+    xp2, yp2, zp2= Plus_Projection.projection(xq,yq,xq,yq,zp,zq,a,b,p)
+    ypm= yp%7
+    
+    j = 1
+    for j in range(len(naf)):
+        (xq,yq,zq)=Plus_Projection.projection(xq,yq,xq,yq,zp,zq,a,b,p)
+        if naf[j]==-1:
+            (xq,yq,zq)=Plus_Projection.projection(xq,yq,xq,ypm,zp,zq,a,b,p)
+        if naf[j]== 0:
+            (xq,yq,zq)=(xq,yq,zq)
+        if naf[j]== 1:
+            (xq,yq,zq)=Plus_Projection.projection(xq,yq,xq,yq,zp,zq,a,b,p)
+                     
+    return(xq,yq,zq)
+
+def NAF_2(xp,yp,k,p,a,b,naf,zp,zq):### ヤコビアン
+    (xq,yq,zq)= (xp,yp,zp)
+    
+    xp0, yp0, zp0= 0, 0, 0
+    xp1, yp1, zp1= xp, yp, zp
+    xp2, yp2, zp2= Plus_Jacobian.projection(xq,yq,xq,yq,zp,zq,a,b,p)
+    ypm= yp%7
+    
+    j = 1
+    for j in range(len(naf)):
+        (xq,yq,zq)=Plus_Jacobian.projection(xq,yq,xq,yq,zp,zq,a,b,p)
+        if naf[j]==-1:
+            (xq,yq,zq)=Plus_Jacobian.projection(xq,yq,xq,ypm,zp,zq,a,b,p)
+        if naf[j]== 0:
+            (xq,yq,zq)=(xq,yq,zq)
+        if naf[j]== 1:
+            (xq,yq,zq)=Plus_Jacobian.projection(xq,yq,xq,yq,zp,zq,a,b,p)
+                     
+    return(xq,yq,zq)
+
+if __name__ == '__main__':
+    main()    
+
+t = time.time() - start 
+T = round(t, 3)
+print("Time :", T) 
