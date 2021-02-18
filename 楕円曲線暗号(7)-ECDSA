@@ -1,0 +1,234 @@
+import math, time, cryptomath, random
+import os
+start = time.time()
+
+def main():
+    xp = 0x6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296
+    xp = int(xp)
+    yp = 0x4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5
+    yp = int(yp)
+    xq, yq= xp, yp
+    
+    a = -3
+    b = 0x5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B
+    p = 0xFFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF
+    b, p= int(b), int(p)
+    zp, zq= 1, 1
+     
+    k = random.randint(p-100, p-1) ##乱数 d_B
+    
+    r = random.randint(k-30, k-1) ##乱数 r
+    r_128 = random.randint(k-30, k-1)
+    
+    l = 1461501637330902918203687197606826779884643492439
+    
+    u, v = 0, 0
+    
+    for x in range(100):
+        (xq,yq,zq)= Public_Key(xp,yp,zp,a,b,p,k,zq)
+    #print(xq,yq)
+    
+        (xq_1, yq_1, zq_1)= Sign(xp,yp,zp,a,b,p,r,zq)
+    #print(xq_1, yq_1, zq_1)
+    
+        (u, v) = Sign_2(xq_1, yq_1, zq_1, k, r, r_128)
+    #print(u, v)
+    
+        (x, y, z)= Sign_3(v, l,xp,yp,zp,xq,yq,zq, r_128,u, a, b, p)
+    #print(x,y,z)
+    
+    if x % l ==u:
+        print('受理')
+    
+
+'================================================================================'
+def projection(xp, yp, zp, xq, yq, zq, a, b, p):
+    w= (a*zp*zp + 3*xp*xp)%p
+    s= (yp*zp)%p
+    B= (s*xp*yp)%p
+    h= (w*w - 8*B)%p
+        
+    u= (yq*zp - yp*zq)%p
+    v= (xq*zp - xp*zq)%p
+    A= (u*u*zp*zq - v*v*v - 2*v*v*xp*zq)%p
+        
+    if(xp==xq and yp!=yq):
+        xr= 0
+        yr= 0
+        zr= 0
+    if(xp==xq and yp==0 and yq==0):
+        xr= 0
+        yr= 0
+        zr= 0
+    elif(xp==xq and yp+yq==p):
+        xr= 0
+        yr= 0
+        zr= 0
+    else:
+        if(zp==0 and zq!=0):
+            xr= xq
+            yr= yq
+            zr= zq
+        elif(zq==0 and zp!=0):
+            xr= xp
+            yr= xp
+            zr= zp
+        elif(zp==0 and zq==0):
+            xr= 0
+            yr= 0
+            zr= 0
+        elif(xp==xq and yp==yq):
+            xr= 2*h*s
+            yr= w*(4*B-h)-8*yp**2*s**2
+            zr= 8*s**3
+        else:
+            xr= v*A
+            yr= u*(v**2*xp*zq-A)-v**3*yp*zq
+            zr= v**3*zp*zq
+    
+    xr= xr%p
+    yr= yr%p
+    zr= zr%p
+    
+    if(zr==0):      
+        xr=0
+        yr=0
+        zr=0
+    elif(zr!=1):
+        izq= pow(zr, -1, p)
+        
+        xr= (xr*izq)%p
+        yr= (yr*izq)%p
+        zr= 1
+    
+    return(xr, yr, zr)
+ 
+'================================================================================'
+def Public_Key(xp,yp,zp,a,b,p,k,zq):##スカラー P_B
+    (xq,yq,zq)=(xp,yp,zp)
+    
+    k3 = 3*k
+    
+    D = format(k, 'b')
+    D3 = format(k3,'b')
+    D3_l = len(D3)
+    D = str(D).zfill(D3_l)
+  
+    for x in range(1, D3_l-1):
+        
+        (xq, yq, zq)=projection(xq,yq,zq,xq,yq,zq,a,b,p)
+
+        if D3[x] =='1' and D[x]=='0':
+            (xq, yq, zq)=projection(xq,yq,zq,xp,yp,zp,a,b,p)
+            
+        elif D3[x] =='0' and D[x]=='1':
+            yp_m=(-yp)%p
+            (xq, yq, zq)=projection(xq,yq,zq,xp,yp_m,zp,a,b,p)
+            
+    return(xq,yq,zq)
+
+
+def Sign(xp,yp,zp,a,b,p,r,zq):##スカラー倍 U
+    (xq_1, yq_1, zq_1)=(xp,yp,zp)
+    
+    r3 = 3*r
+    
+    E = format(r, 'b')
+    E3 = format(r3, 'b')
+    E3_l = len(E3)
+    E = str(E).zfill(E3_l)
+    
+    for x in range(1, E3_l-1):
+        (xq_1, yq_1, zq_1)=projection(xq_1, yq_1, zq_1, xq_1,yq_1,zq_1,a,b,p)
+        
+        if E3[x] =='1' and E[x]=='0':
+            (xq_1, yq_1, zq_1)=projection(xq_1,yq_1,zq_1,xq_1,yq_1,zq_1,a,b,p)
+            
+        elif E3[x] =='0' and E[x]=='1':
+            yp_m=(-yp)%p
+            (xq_1, yq_1, zq_1)=projection(xq_1,yq_1,zq_1,xq_1,yp_m,zq_1,a,b,p)
+        
+    return(xq_1, yq_1, zq_1)
+
+
+
+def Sign_2(xq_1, yq_1, zq_1, k, r , r_128):
+    (xq_2, yq_2, zq_2) = (xq_1, yq_1, zq_1)
+    
+    l = 1461501637330902918203687197606826779884643492439
+    
+    #r_128 = os.urandom(1) ## 128bit乱数 : hash 値
+    #r_128 = random.randint(k-30, k-1)
+    
+    u = xq_1 % l
+    v = ((r_128 + u * k)/r) % l
+    
+    return(u, v)
+
+
+def Sign_3(v, l,xp,yp,zp,xq,yq,zq, r_128,u, a, b, p):
+    
+    d = (1/v) % l
+    d = int(d)
+    
+    dHM = d * r_128 
+    du = d* u
+    
+    (xp_a, yp_a, zp_a) = (xp,yp,zp)### P
+    (xp_b, yp_b, zp_b) = (xq,yq,zq)### P_b
+    
+    
+    ### d * H(m) * p
+    dHM3 = 3*dHM
+    
+    dHM = format(dHM, 'b')
+    dHM3 = format(dHM3, 'b')
+    dHM3_l = len(dHM3)
+    dHM = str(dHM).zfill(dHM3_l)
+    
+    for x in range(1, dHM3_l-1):
+        
+        (xp_a, yp_a, zp_a)=projection(xp,yp,zp,xp,yp,zp,a,b,p)
+
+        if dHM3[x] =='1' and dHM[x]=='0':
+            (xp_a, yp_a, zp_a)=projection(xp,yp,zp,xp,yp,zp,a,b,p)
+            
+        elif dHM3[x] =='0' and dHM[x]=='1':
+            yp_m=(-yp)%p
+            (xp_a, yp_a, zp_a)=projection(xp,yp,zp,xp,yp_m,zp,a,b,p)
+            
+    return(xp_a, yp_a, zp_a)
+
+
+    ### d * u * p_b
+    du3 = 3*du
+    
+    du = format(du, 'b')
+    du3 = format(du3, 'b')
+    du3_l = len(du3)
+    du = str(du).zfill(du3_l)
+    
+    for x in range(1, du3_l-1):
+        
+        (xp_b, yp_b, zp_b)=projection(xq,yq,zq,xq,yq,zq,a,b,p)
+
+        if du3[x] =='1' and du[x]=='0':
+            (xp_b, yp_b, zp_b)=projection(xq,yq,zq,xp,yp,zp,a,b,p)
+            
+        elif du3[x] =='0' and du[x]=='1':
+            yp_m=(-yp)%p
+            (xp_b, yp_b, zp_b)=projection(xq,yq,zq,xp,yp_m,zp,a,b,p)
+            
+    return(xp_b, yp_b, zp_b)
+
+    (x, y, z) = projection(xp_a, yp_a, zp_a, xp_b, yp_b, zp_b, a, b, p)
+    
+    return(x, y, z)
+    
+
+if __name__ == '__main__':
+    main()    
+    
+t = time.time() - start 
+T = round(t, 4)
+print("Time :", T) 
